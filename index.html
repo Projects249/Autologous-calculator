@@ -1,0 +1,1232 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <meta name="theme-color" content="#000000" />
+    <title>Stem Cells</title>
+    <link rel="manifest" href="./manifest.json" />
+    <link rel="icon" type="image/png" sizes="192x192" href="./Icon(192).png" />
+    <link rel="apple-touch-icon" type="image/png" sizes="192x192" href="./Icon(192).png" />
+    <style>
+      :root {
+        --bg: #f4f7fb;
+        --card: #ffffff;
+        --primary: #1f6feb;
+        --primary-dark: #164db5;
+        --text: #1f2937;
+        --muted: #6b7280;
+        --border: #dfe7f1;
+        --success: #0f766e;
+      }
+
+      * {
+        box-sizing: border-box;
+      }
+
+      body {
+        margin: 0;
+        font-family: Arial, Helvetica, sans-serif;
+        background: linear-gradient(135deg, #eef5ff 0%, #f8fafc 100%);
+        min-height: 100svh;
+        color: var(--text);
+      }
+
+      .page {
+        display: grid;
+        gap: 12px;
+        width: min(100%, 1500px);
+        margin: 0 auto;
+        padding: 16px;
+      }
+
+      .tabs {
+        display: grid;
+        grid-template-columns: repeat(4, minmax(0, 1fr));
+        gap: 4px;
+        width: 100%;
+        padding: 4px;
+        border: 1px solid var(--border);
+        border-radius: 10px;
+        background: #e9eef5;
+      }
+
+      .tab-button {
+        min-height: 54px;
+        margin: 0;
+        padding: 8px 6px;
+        border-radius: 7px;
+        background: transparent;
+        color: var(--muted);
+        font-size: 0.83rem;
+        line-height: 1.2;
+      }
+
+      .tab-button[aria-selected="true"] {
+        background: #fff;
+        color: var(--primary-dark);
+        box-shadow: 0 1px 4px rgba(31, 41, 55, 0.12);
+      }
+
+      .tab-panel[hidden] {
+        display: none;
+      }
+
+      .patient-grid {
+        display: grid;
+        grid-template-columns: repeat(5, minmax(0, 1fr));
+        gap: 10px 12px;
+        align-items: end;
+      }
+
+      #resetAllBtn {
+        margin-top: 0;
+        background: #e5e7eb;
+        color: var(--text);
+      }
+
+      #resetAllBtn:hover {
+        background: #d1d5db;
+      }
+
+      .persistence-status {
+        margin-top: 10px;
+        color: #b91c1c;
+        font-size: 0.85rem;
+      }
+
+      .calculator-grid {
+        display: grid;
+        grid-template-columns: minmax(0, 1fr);
+        gap: 12px;
+        align-items: start;
+      }
+
+      .card {
+        width: 100%;
+        background: var(--card);
+        border: 1px solid var(--border);
+        border-radius: 12px;
+        box-shadow: 0 12px 30px rgba(31, 111, 235, 0.08);
+        padding: 20px;
+      }
+
+      h1 {
+        margin: 0 0 14px;
+        text-align: center;
+        font-size: 1.55rem;
+        color: var(--primary-dark);
+      }
+
+      .app-header h1 {
+        margin: 0;
+      }
+
+      .input-grid {
+        display: grid;
+        grid-template-columns: repeat(2, minmax(0, 1fr));
+        gap: 10px 12px;
+      }
+
+      .form-group {
+        min-width: 0;
+        margin: 0;
+      }
+
+      label {
+        display: block;
+        min-height: 2.2em;
+        margin-bottom: 4px;
+        font-size: 0.86rem;
+        line-height: 1.2;
+        font-weight: 600;
+      }
+
+      input,
+      select,
+      button {
+        width: 100%;
+        font: inherit;
+      }
+
+      input,
+      select {
+        min-width: 0;
+        padding: 9px 10px;
+        border-radius: 8px;
+        border: 1px solid var(--border);
+        background: #fff;
+        color: var(--text);
+        outline: none;
+      }
+
+      input[type="number"] {
+        appearance: textfield;
+        -moz-appearance: textfield;
+      }
+
+      input[type="number"]::-webkit-inner-spin-button,
+      input[type="number"]::-webkit-outer-spin-button {
+        margin: 0;
+        -webkit-appearance: none;
+      }
+
+      input:focus,
+      select:focus {
+        border-color: var(--primary);
+        box-shadow: 0 0 0 3px rgba(31, 111, 235, 0.12);
+      }
+
+      button {
+        margin-top: 12px;
+        border: none;
+        border-radius: 8px;
+        color: white;
+        font-weight: 700;
+        padding: 11px;
+        cursor: pointer;
+        transition: background 0.2s ease;
+      }
+
+      .actions {
+        display: grid;
+        grid-template-columns: 2fr 1fr;
+        gap: 10px;
+      }
+
+      .actions button {
+        margin-top: 12px;
+      }
+
+      #calculateBtn,
+      #calculateTargetBtn,
+      #calculatePrimeBtn,
+      #calculateYieldBtn,
+      #installPwaBtn {
+        background: var(--primary);
+      }
+
+      #calculateBtn:hover,
+      #calculateTargetBtn:hover,
+      #calculatePrimeBtn:hover,
+      #calculateYieldBtn:hover,
+      #installPwaBtn:hover {
+        background: var(--primary-dark);
+      }
+
+      #resetBtn,
+      #resetTargetBtn,
+      #resetPrimeBtn,
+      #resetYieldBtn {
+        background: #e5e7eb;
+        color: var(--text);
+      }
+
+      #resetBtn:hover,
+      #resetTargetBtn:hover,
+      #resetPrimeBtn:hover,
+      #resetYieldBtn:hover {
+        background: #d1d5db;
+      }
+
+      .result {
+        margin-top: 0;
+        background: #ecfdf5;
+        border: 1px solid #a7f3d0;
+        border-radius: 8px;
+        padding: 10px 8px;
+        text-align: center;
+        min-width: 0;
+      }
+
+      .result-label {
+        font-size: 0.9rem;
+        color: var(--muted);
+      }
+
+      .result-value {
+        margin-top: 6px;
+        font-size: 1.25rem;
+        font-weight: 700;
+        color: var(--success);
+        overflow-wrap: anywhere;
+      }
+
+      .error {
+        margin-top: 12px;
+        color: #b91c1c;
+        font-size: 0.92rem;
+        min-height: 1.2em;
+      }
+
+      .weight-basis {
+        margin-top: 12px;
+        color: var(--primary-dark);
+        font-size: 0.92rem;
+        font-weight: 700;
+      }
+
+      .results {
+        display: grid;
+        grid-template-columns: repeat(2, minmax(0, 1fr));
+        gap: 8px;
+        margin-top: 12px;
+      }
+
+      .result-label {
+        line-height: 1.35;
+      }
+
+      .result-value {
+        font-size: 1.35rem;
+        overflow-wrap: anywhere;
+      }
+
+      .result-value.high-rbc-out {
+        color: #b91c1c;
+      }
+
+      .yield-table-wrapper {
+        margin-top: 12px;
+        overflow-x: auto;
+      }
+
+      .yield-table {
+        width: 100%;
+        min-width: 480px;
+        border-collapse: collapse;
+        text-align: center;
+      }
+
+      .yield-table th,
+      .yield-table td {
+        padding: 8px;
+        border: 1px solid var(--border);
+        white-space: nowrap;
+      }
+
+      .yield-table thead th,
+      .yield-table tbody th {
+        background: #e9eef5;
+      }
+
+      .app-footer {
+        padding: 14px 8px 8px;
+        border-top: 1px solid var(--border);
+        color: var(--muted);
+        font-size: 0.82rem;
+        text-align: center;
+      }
+
+      .app-footer-details {
+        display: flex;
+        flex-wrap: wrap;
+        justify-content: center;
+        gap: 6px 16px;
+      }
+
+      .app-footer-details strong {
+        color: var(--text);
+      }
+
+      .app-install {
+        margin-top: 12px;
+      }
+
+      #installPwaBtn {
+        width: auto;
+        min-width: 190px;
+      }
+
+      .app-install-status {
+        margin: 8px 0 0;
+        font-size: 0.8rem;
+      }
+
+      .app-footer a {
+        color: var(--primary-dark);
+      }
+
+      .app-footer-note {
+        margin: 8px 0 0;
+        font-size: 0.78rem;
+      }
+
+      @media (max-width: 700px) {
+        .tabs {
+          grid-template-columns: repeat(2, minmax(0, 1fr));
+        }
+
+        .patient-grid {
+          grid-template-columns: repeat(3, minmax(0, 1fr));
+        }
+      }
+
+      @media (max-width: 480px) {
+        .page {
+          padding: 10px;
+        }
+
+        .card {
+          padding: 14px;
+        }
+
+        .patient-grid {
+          grid-template-columns: repeat(2, minmax(0, 1fr));
+          gap: 8px;
+        }
+
+        #resetAllBtn {
+          grid-column: 1 / -1;
+        }
+
+        .input-grid {
+          gap: 8px;
+        }
+
+        .result-label {
+          font-size: 0.8rem;
+        }
+
+        .result-value {
+          font-size: 1.1rem;
+        }
+      }
+
+      @media (min-width: 701px) {
+        .patient-panel {
+          position: sticky;
+          top: 0;
+          z-index: 10;
+        }
+      }
+
+      @media (min-width: 1100px) {
+        .tabs {
+          display: none;
+        }
+
+        .calculator-grid {
+          grid-template-columns: repeat(2, minmax(0, 1fr));
+          gap: 12px;
+        }
+      }
+
+    </style>
+  </head>
+  <body>
+    <main class="page">
+      <header class="card app-header">
+        <h1>Apheresis Calculation Panel</h1>
+      </header>
+      <section class="card patient-panel" aria-labelledby="patientHeading">
+        <h1 id="patientHeading">Patient</h1>
+        <div class="patient-grid">
+          <div class="form-group">
+            <label for="gender">Sex</label>
+            <select id="gender">
+              <option value="male">Male</option>
+              <option value="female">Female</option>
+            </select>
+          </div>
+          <div class="form-group">
+            <label for="height">Height (cm)</label>
+            <input id="height" type="number" min="0" step="any" />
+          </div>
+          <div class="form-group">
+            <label for="weight">Weight (kg)</label>
+            <input id="weight" type="number" min="0" step="any" />
+          </div>
+          <div class="form-group">
+            <label for="leucocytes">White Blood Cell Count</label>
+            <input id="leucocytes" type="number" min="0" step="any" />
+          </div>
+          <button type="button" id="resetAllBtn">Reset All</button>
+        </div>
+        <div id="persistenceStatus" class="persistence-status" role="status" aria-live="polite" hidden></div>
+      </section>
+
+      <div class="tabs" role="tablist" aria-label="Calculators">
+        <button class="tab-button" id="tbvTab" type="button" role="tab" aria-selected="true" aria-controls="tbvPanel" tabindex="0">No. of Cycles</button>
+        <button class="tab-button" id="apheresisTab" type="button" role="tab" aria-selected="false" aria-controls="apheresisPanel" tabindex="-1">Apheresis Estimate to Target</button>
+        <button class="tab-button" id="cellCollectionTab" type="button" role="tab" aria-selected="false" aria-controls="cellCollectionPanel" tabindex="-1">Apheresis Custom Prime</button>
+        <button class="tab-button" id="yieldTab" type="button" role="tab" aria-selected="false" aria-controls="yieldPanel" tabindex="-1">CD34 Yield Estimation</button>
+      </div>
+
+      <div class="calculator-grid">
+      <section class="card tab-panel" id="tbvPanel" role="tabpanel" aria-labelledby="tbvTab">
+        <h1>No. of Cycles</h1>
+        <div class="input-grid">
+          <div class="form-group">
+            <label for="procedureType">Procedure Type</label>
+            <select id="procedureType">
+              <option value="1">Autologous (MM G-CSF only)</option>
+              <option value="0">Autologous</option>
+            </select>
+          </div>
+          <div class="form-group">
+            <label for="tbv">Total Blood Volume (mL)</label>
+            <input id="tbv" type="number" min="0" step="any" />
+          </div>
+          <div class="form-group">
+            <label for="bloodVolumes">Blood Volumes</label>
+            <input id="bloodVolumes" type="number" min="0" step="any" />
+          </div>
+          <div class="form-group">
+            <label for="bloodToBeProcessed">Total Blood To Be Processed (mL)</label>
+            <input id="bloodToBeProcessed" type="number" min="0" step="any" />
+          </div>
+        </div>
+        <div class="actions">
+          <button type="button" id="calculateBtn">Calculate Cycles</button>
+          <button type="button" id="resetBtn">Reset</button>
+        </div>
+        <div id="error" class="error" role="alert"></div>
+        <div class="results" aria-live="polite">
+          <div class="result">
+            <div class="result-label">Total Blood Volume</div>
+            <div class="result-value" id="tbvOutput">--</div>
+          </div>
+          <div class="result">
+            <div class="result-label">Blood Volumes</div>
+            <div class="result-value" id="bloodVolumesOutput">--</div>
+          </div>
+          <div class="result">
+            <div class="result-label">Total Blood To Be Processed</div>
+            <div class="result-value" id="bloodToBeProcessedOutput">--</div>
+          </div>
+          <div class="result">
+            <div class="result-label">WB Per Cycle</div>
+            <div class="result-value" id="wbPerCycleOutput">--</div>
+          </div>
+          <div class="result">
+            <div class="result-label">Cycles</div>
+            <div class="result-value" id="cyclesOutput">--</div>
+          </div>
+          <div class="result">
+            <div class="result-label">Estimated Time</div>
+            <div class="result-value" id="timeOutput">--</div>
+          </div>
+        </div>
+      </section>
+
+      <section class="card tab-panel" id="apheresisPanel" role="tabpanel" aria-labelledby="apheresisTab" hidden>
+        <h1>Apheresis Estimate to Target</h1>
+        <div class="input-grid">
+          <div class="form-group">
+            <label for="cd34Target">CD34 Target (x10^6/kg)</label>
+            <input id="cd34Target" type="number" min="0" step="any" />
+          </div>
+          <div class="form-group">
+            <label for="flowCytometryCount">Flow Cytometry CD34 Count (x10^6/L)</label>
+            <input id="flowCytometryCount" type="number" min="0" step="any" />
+          </div>
+        </div>
+        <div class="actions">
+          <button type="button" id="calculateTargetBtn">Calculate Estimate</button>
+          <button type="button" id="resetTargetBtn">Reset</button>
+        </div>
+        <div id="targetError" class="error" role="alert"></div>
+        <div class="weight-basis" id="weightBasisOutput" aria-live="polite">Weight Used: --</div>
+        <div class="results" aria-live="polite">
+          <div class="result">
+            <div class="result-label">Total Blood Volume</div>
+            <div class="result-value" id="targetTbvOutput">--</div>
+          </div>
+          <div class="result">
+            <div class="result-label">BMI</div>
+            <div class="result-value" id="bmiOutput">--</div>
+          </div>
+          <div class="result">
+            <div class="result-label">Ideal Weight</div>
+            <div class="result-value" id="idealWeightOutput">--</div>
+          </div>
+          <div class="result">
+            <div class="result-label">Adjusted Weight</div>
+            <div class="result-value" id="adjustedWeightOutput">--</div>
+          </div>
+          <div class="result">
+            <div class="result-label">Blood To Be Processed</div>
+            <div class="result-value" id="targetBloodProcessedOutput">--</div>
+          </div>
+          <div class="result">
+            <div class="result-label">Blood Volumes Estimate</div>
+            <div class="result-value" id="volumesWantedOutput">--</div>
+          </div>
+        </div>
+      </section>
+
+      <section class="card tab-panel" id="cellCollectionPanel" role="tabpanel" aria-labelledby="cellCollectionTab" hidden>
+        <h1>Apheresis Custom Prime</h1>
+
+        <div class="input-grid">
+          <div class="form-group">
+            <label for="primeProcedureType">Procedure Type</label>
+            <select id="primeProcedureType">
+              <option value="0">Autologous</option>
+              <option value="1" selected>Autologous (MM G-CSF Only)</option>
+            </select>
+          </div>
+          <div class="form-group">
+            <label for="patientHct">Patient HCT</label>
+            <input id="patientHct" type="number" min="0" step="any" />
+          </div>
+        </div>
+
+        <div class="actions">
+          <button type="button" id="calculatePrimeBtn">Calculate Max RBC Out</button>
+          <button type="button" id="resetPrimeBtn">Reset</button>
+        </div>
+        <div id="primeError" class="error" role="alert"></div>
+        <div class="results" aria-live="polite">
+          <div class="result">
+            <div class="result-label">Total Blood Volume</div>
+            <div class="result-value" id="primeTbvOutput">--</div>
+          </div>
+          <div class="result">
+            <div class="result-label">Max RBC Out</div>
+            <div class="result-value" id="maxRbcOutOutput">--</div>
+          </div>
+        </div>
+      </section>
+
+      <section class="card tab-panel" id="yieldPanel" role="tabpanel" aria-labelledby="yieldTab" hidden>
+        <h1>CD34 Yield Estimation</h1>
+        <div class="input-grid">
+          <div class="form-group">
+            <label for="peripheralCd34">Peripheral CD34</label>
+            <input id="peripheralCd34" type="number" min="0" step="any" />
+          </div>
+        </div>
+        <div class="actions">
+          <button type="button" id="calculateYieldBtn">Calculate Yield</button>
+          <button type="button" id="resetYieldBtn">Reset</button>
+        </div>
+        <div id="yieldError" class="error" role="alert"></div>
+        <div class="yield-table-wrapper" aria-live="polite">
+          <table class="yield-table">
+            <thead>
+              <tr>
+                <th scope="col">CEC</th>
+                <th scope="col">2 TBVs</th>
+                <th scope="col">3 TBVs</th>
+                <th scope="col">4 TBVs</th>
+                <th scope="col">5 TBVs</th>
+                <th scope="col">6 TBVs</th>
+              </tr>
+            </thead>
+            <tbody id="yieldTableBody"></tbody>
+          </table>
+        </div>
+      </section>
+      </div>
+      <footer class="app-footer">
+        <div class="app-footer-details">
+          <strong>Apheresis Calculation Panel</strong>
+          <span>Author: Daniel Polach</span >
+          <span>Support: <a href="mailto:danielpolach249@gmail.com">danielpolach249@gmail.com</a></span>
+          <span>Version 1.16</span>
+          <span>Created 2026</span>
+        </div>
+        <div class="app-install">
+          <button type="button" id="installPwaBtn">Install as PWA</button>
+          <p id="installPwaStatus" class="app-install-status" role="status" aria-live="polite" hidden></p>
+        </div>
+       </footer>
+    </main>
+
+    <script>
+      const tabButtons = [...document.querySelectorAll('[role="tab"]')];
+      const tabPanels = [...document.querySelectorAll('[role="tabpanel"]')];
+      const calculateBtn = document.getElementById('calculateBtn');
+      const resetBtn = document.getElementById('resetBtn');
+      const resetAllBtn = document.getElementById('resetAllBtn');
+      const persistenceStatus = document.getElementById('persistenceStatus');
+      const persistentFields = [...document.querySelectorAll('input[id], select[id]')];
+      const persistenceKey = 'tbv-calculator-form-v1';
+      const procedureTypeInput = document.getElementById('procedureType');
+      const leucocytesInput = document.getElementById('leucocytes');
+      const tbvInput = document.getElementById('tbv');
+      const genderInput = document.getElementById('gender');
+      const heightInput = document.getElementById('height');
+      const weightInput = document.getElementById('weight');
+      const bloodVolumesInput = document.getElementById('bloodVolumes');
+      const bloodToBeProcessedInput = document.getElementById('bloodToBeProcessed');
+      const errorBox = document.getElementById('error');
+      const tbvOutput = document.getElementById('tbvOutput');
+      const bloodVolumesOutput = document.getElementById('bloodVolumesOutput');
+      const bloodToBeProcessedOutput = document.getElementById('bloodToBeProcessedOutput');
+      const wbPerCycleOutput = document.getElementById('wbPerCycleOutput');
+      const cyclesOutput = document.getElementById('cyclesOutput');
+      const timeOutput = document.getElementById('timeOutput');
+      const cd34TargetInput = document.getElementById('cd34Target');
+      const flowCytometryCountInput = document.getElementById('flowCytometryCount');
+      const calculateTargetBtn = document.getElementById('calculateTargetBtn');
+      const resetTargetBtn = document.getElementById('resetTargetBtn');
+      const targetErrorBox = document.getElementById('targetError');
+      const weightBasisOutput = document.getElementById('weightBasisOutput');
+      const bmiOutput = document.getElementById('bmiOutput');
+      const idealWeightOutput = document.getElementById('idealWeightOutput');
+      const adjustedWeightOutput = document.getElementById('adjustedWeightOutput');
+      const targetTbvOutput = document.getElementById('targetTbvOutput');
+      const targetBloodProcessedOutput = document.getElementById('targetBloodProcessedOutput');
+      const volumesWantedOutput = document.getElementById('volumesWantedOutput');
+      const primeProcedureTypeInput = document.getElementById('primeProcedureType');
+      const patientHctInput = document.getElementById('patientHct');
+      const calculatePrimeBtn = document.getElementById('calculatePrimeBtn');
+      const resetPrimeBtn = document.getElementById('resetPrimeBtn');
+      const primeErrorBox = document.getElementById('primeError');
+      const primeTbvOutput = document.getElementById('primeTbvOutput');
+      const maxRbcOutOutput = document.getElementById('maxRbcOutOutput');
+      const peripheralCd34Input = document.getElementById('peripheralCd34');
+      const calculateYieldBtn = document.getElementById('calculateYieldBtn');
+      const resetYieldBtn = document.getElementById('resetYieldBtn');
+      const yieldErrorBox = document.getElementById('yieldError');
+      const yieldTableBody = document.getElementById('yieldTableBody');
+      const desktopLayout = window.matchMedia('(min-width: 1100px)');
+      let activePanelId = 'tbvPanel';
+      const yieldEfficiencies = [0.4, 0.35, 0.3, 0.25, 0.2, 0.15];
+      const yieldBloodVolumeCounts = [2, 3, 4, 5, 6];
+
+      const customPrimeConstants = {
+        kitWbVol: 130,
+        bloodWarmerVolume: 44,
+        acdRatio: 12,
+        packedRbcHct: 0.85,
+        mmGcsfOnlyRbcOffsetVolume: 8,
+        rbcPackExtraVolume: 46
+      };
+
+      customPrimeConstants.kitPackedRbcVolume =
+        customPrimeConstants.kitWbVol + customPrimeConstants.bloodWarmerVolume;
+
+      const lookupData = {
+        rowKeys: ['ROW1', 'ROW2', 'ROW3', 'ROW4', 'ROW5', 'ROW6', 'ROW7', 'ROW8', 'ROW9', 'ROW10'],
+        columnKeys: ['COL1', 'COL2', 'COL3', 'COL4'],
+        cells: {
+          ROW1: { COL1: [1100, 7.0, 90], COL2: [1100, 8.0, 60], COL3: [1100, 6.8, 90], COL4: [1500, 5.0, 90] },
+          ROW2: { COL1: [1000, 7.0, 85], COL2: [1000, 8.0, 60], COL3: [1000, 6.8, 80], COL4: [1500, 5.0, 80] },
+          ROW3: { COL1: [900, 7.0, 75], COL2: [900, 8.0, 60], COL3: [900, 6.8, 75], COL4: [1400, 5.0, 75] },
+          ROW4: { COL1: [700, 7.0, 75], COL2: [700, 8.0, 60], COL3: [700, 6.5, 75], COL4: [1400, 5.0, 75] },
+          ROW5: { COL1: [600, 6.5, 70], COL2: [600, 8.0, 60], COL3: [600, 6.5, 70], COL4: [1400, 5.0, 70] },
+          ROW6: { COL1: [600, 6.5, 65], COL2: [600, 8.0, 60], COL3: [600, 6.5, 70], COL4: [1300, 5.0, 70] },
+          ROW7: { COL1: [600, 6.5, 65], COL2: [600, 8.0, 60], COL3: [600, 6.3, 65], COL4: [1300, 5.0, 65] },
+          ROW8: { COL1: [600, 6.5, 60], COL2: [600, 8.0, 60], COL3: [500, 6.3, 60], COL4: [1200, 5.0, 60] },
+          ROW9: { COL1: [550, 6.5, 60], COL2: [550, 8.0, 60], COL3: [500, 6.3, 60], COL4: [1100, 5.0, 60] },
+          ROW10: { COL1: [500, 6.5, 60], COL2: [550, 8.0, 60], COL3: [500, 6.3, 60], COL4: [1000, 5.0, 60] }
+        }
+      };
+
+      function updatePanelVisibility() {
+        tabPanels.forEach((panel) => {
+          panel.hidden = !desktopLayout.matches && panel.id !== activePanelId;
+        });
+      }
+
+      function activateTab(selectedTab) {
+        activePanelId = selectedTab.getAttribute('aria-controls');
+        tabButtons.forEach((tab) => {
+          const selected = tab === selectedTab;
+          tab.setAttribute('aria-selected', String(selected));
+          tab.tabIndex = selected ? 0 : -1;
+        });
+        updatePanelVisibility();
+      }
+
+      desktopLayout.addEventListener('change', updatePanelVisibility);
+      updatePanelVisibility();
+
+      tabButtons.forEach((tab, index) => {
+        tab.addEventListener('click', () => activateTab(tab));
+        tab.addEventListener('keydown', (event) => {
+          let nextIndex = index;
+          if (event.key === 'ArrowRight') nextIndex = (index + 1) % tabButtons.length;
+          else if (event.key === 'ArrowLeft') nextIndex = (index - 1 + tabButtons.length) % tabButtons.length;
+          else return;
+          event.preventDefault();
+          tabButtons[nextIndex].focus();
+          activateTab(tabButtons[nextIndex]);
+        });
+      });
+
+      function calculateTBV(gender, heightCm, weightKg) {
+        const heightM = heightCm / 100;
+        if (gender === 'male') {
+          return 0.3669 * Math.pow(heightM, 3) + 0.03219 * weightKg + 0.6041;
+        }
+        return 0.3561 * Math.pow(heightM, 3) + 0.03308 * weightKg + 0.1833;
+      }
+
+      function readNumber(input, allowZero = false) {
+        if (input.value.trim() === '') return null;
+        const value = Number(input.value);
+        return Number.isFinite(value) && (allowZero ? value >= 0 : value > 0) ? value : NaN;
+      }
+
+      function getWbRow(leucocytes) {
+        if (leucocytes < 5) return 'ROW1';
+        if (leucocytes <= 10) return 'ROW2';
+        if (leucocytes <= 20) return 'ROW3';
+        if (leucocytes <= 30) return 'ROW4';
+        if (leucocytes <= 40) return 'ROW5';
+        if (leucocytes <= 50) return 'ROW6';
+        if (leucocytes <= 60) return 'ROW7';
+        if (leucocytes <= 80) return 'ROW8';
+        if (leucocytes <= 100) return 'ROW9';
+        return 'ROW10';
+      }
+
+      function clearResults() {
+        tbvOutput.textContent = '--';
+        bloodVolumesOutput.textContent = '--';
+        bloodToBeProcessedOutput.textContent = '--';
+        wbPerCycleOutput.textContent = '--';
+        cyclesOutput.textContent = '--';
+        timeOutput.textContent = '--';
+      }
+
+      function calculate() {
+        errorBox.textContent = '';
+        clearResults();
+
+        const leucocytes = readNumber(leucocytesInput, true);
+        const manualTbv = readNumber(tbvInput);
+        const bloodVolumes = readNumber(bloodVolumesInput);
+        const manualBloodToBeProcessed = readNumber(bloodToBeProcessedInput);
+        const height = readNumber(heightInput);
+        const weight = readNumber(weightInput);
+        if ([leucocytes, manualTbv, bloodVolumes, manualBloodToBeProcessed, height, weight].some(Number.isNaN)) {
+          errorBox.textContent = 'Entered values must be greater than zero.';
+          return;
+        }
+
+        let tbv = manualTbv;
+        if (tbv === null && height !== null && weight !== null) {
+          tbv = calculateTBV(genderInput.value, height, weight) * 1000;
+          tbvInput.value = tbv.toFixed(0);
+        }
+
+        tbvOutput.textContent = tbv === null ? '--' : `${tbv.toFixed(0)} mL`;
+
+        let bloodToBeProcessed = manualBloodToBeProcessed;
+        if (bloodToBeProcessed === null && tbv !== null && bloodVolumes !== null) {
+          bloodToBeProcessed = tbv * bloodVolumes;
+        }
+
+        let resolvedBloodVolumes = bloodVolumes;
+        if (resolvedBloodVolumes === null && tbv !== null && bloodToBeProcessed !== null) {
+          resolvedBloodVolumes = bloodToBeProcessed / tbv;
+          bloodVolumesInput.value = resolvedBloodVolumes.toFixed(2);
+        }
+
+        bloodVolumesOutput.textContent = resolvedBloodVolumes === null ? '--' : resolvedBloodVolumes.toFixed(2);
+        bloodToBeProcessedOutput.textContent = bloodToBeProcessed === null ? '--' : `${bloodToBeProcessed.toFixed(0)} mL`;
+        saveFormState();
+
+        if (leucocytes !== null) {
+          const rowKey = getWbRow(leucocytes);
+          const columnKey = `COL${Number(procedureTypeInput.value) + 1}`;
+          const wbPerCycle = lookupData.cells[rowKey]?.[columnKey]?.[0];
+          if (!Number.isFinite(wbPerCycle) || wbPerCycle <= 0) {
+            errorBox.textContent = `No WB-per-cycle value is available for ${rowKey}, ${columnKey}.`;
+            return;
+          }
+
+          wbPerCycleOutput.textContent = `${wbPerCycle}`;
+          if (bloodToBeProcessed !== null) {
+            const cycles = bloodToBeProcessed / wbPerCycle;
+            const totalMinutes = Math.round(cycles * 15);
+            const hours = Math.floor(totalMinutes / 60);
+            const minutes = totalMinutes % 60;
+            cyclesOutput.textContent = cycles.toFixed(2);
+            timeOutput.textContent = `${hours} hr ${minutes} min`;
+          }
+        }
+      }
+
+      function resetForm() {
+        procedureTypeInput.value = '1';
+        tbvInput.value = '';
+        bloodVolumesInput.value = '';
+        bloodToBeProcessedInput.value = '';
+        errorBox.textContent = '';
+        clearResults();
+        saveFormState();
+      }
+
+      function clearTargetResults() {
+        weightBasisOutput.textContent = 'Weight Used: --';
+        bmiOutput.textContent = '--';
+        idealWeightOutput.textContent = '--';
+        adjustedWeightOutput.textContent = '--';
+        targetTbvOutput.textContent = '--';
+        targetBloodProcessedOutput.textContent = '--';
+        volumesWantedOutput.textContent = '--';
+      }
+
+      function calculateTargetEstimate() {
+        targetErrorBox.textContent = '';
+        clearTargetResults();
+
+        const height = readNumber(heightInput);
+        const measuredWeight = readNumber(weightInput);
+        const cd34Target = readNumber(cd34TargetInput);
+        const flowCytometryCount = readNumber(flowCytometryCountInput);
+        if ([height, measuredWeight, cd34Target, flowCytometryCount].some(Number.isNaN)) {
+          targetErrorBox.textContent = 'Entered values must be greater than zero.';
+          return;
+        }
+        if (height === null || measuredWeight === null) {
+          targetErrorBox.textContent = 'Enter valid positive values for height and weight.';
+          return;
+        }
+
+        const bmi = measuredWeight / Math.pow(height / 100, 2);
+        const idealWeight = genderInput.value === 'male'
+          ? 50 + (2.3 * (height - 152.4) / 2.54)
+          : 40.5 + (2.3 * (height - 152.4) / 2.54);
+        const adjustedWeight = measuredWeight > idealWeight
+          ? idealWeight + (0.4 * (measuredWeight - idealWeight))
+          : measuredWeight;
+
+        let weightForTarget;
+        let weightBasis;
+        if (measuredWeight < idealWeight) {
+          weightForTarget = idealWeight;
+          weightBasis = 'Ideal Weight';
+        } else if (bmi > 100) {
+          weightForTarget = adjustedWeight;
+          weightBasis = 'Adjusted Weight';
+        } else if (bmi < 100) {
+          weightForTarget = measuredWeight;
+          weightBasis = 'Measured Weight';
+        } else {
+          targetErrorBox.textContent = 'No weight rule is specified for a BMI of exactly 100.';
+          return;
+        }
+
+        const tbvLiters = calculateTBV(genderInput.value, height, measuredWeight);
+
+        weightBasisOutput.textContent = `Weight Used: ${weightBasis}`;
+        bmiOutput.textContent = bmi.toFixed(2);
+        idealWeightOutput.textContent = `${idealWeight.toFixed(2)} kg`;
+        adjustedWeightOutput.textContent = `${adjustedWeight.toFixed(2)} kg`;
+        targetTbvOutput.textContent = `${(tbvLiters * 1000).toFixed(0)} mL`;
+        if (cd34Target !== null && flowCytometryCount !== null) {
+          const bloodToBeProcessedLiters = cd34Target * weightForTarget / (flowCytometryCount * 0.32);
+          targetBloodProcessedOutput.textContent = `${(bloodToBeProcessedLiters * 1000).toFixed(0)} mL`;
+          volumesWantedOutput.textContent = (bloodToBeProcessedLiters / tbvLiters).toFixed(2);
+        }
+      }
+
+      function resetTargetEstimate() {
+        cd34TargetInput.value = '';
+        flowCytometryCountInput.value = '';
+        targetErrorBox.textContent = '';
+        clearTargetResults();
+        saveFormState();
+      }
+
+      function clearPrimeResults() {
+        primeTbvOutput.textContent = '--';
+        maxRbcOutOutput.textContent = '--';
+        maxRbcOutOutput.classList.remove('high-rbc-out');
+      }
+
+      function calculateCustomPrime() {
+        primeErrorBox.textContent = '';
+        clearPrimeResults();
+
+        const kitWbVol = customPrimeConstants.kitWbVol;
+        const bloodWarmerVol = customPrimeConstants.bloodWarmerVolume;
+        const acdRatio = customPrimeConstants.acdRatio;
+        const packedRbcHct = customPrimeConstants.packedRbcHct;
+        const isMmGcsfOnly = primeProcedureTypeInput.value === '1';
+        const wbc = isMmGcsfOnly ? null : readNumber(leucocytesInput);
+        const patientHct = readNumber(patientHctInput);
+        const height = readNumber(heightInput);
+        const patientWeight = readNumber(weightInput);
+
+        const values = [
+          kitWbVol, bloodWarmerVol, acdRatio, packedRbcHct,
+          ...(isMmGcsfOnly ? [] : [wbc]),
+          patientHct, height, patientWeight
+        ];
+        if (values.some((value) => value === null || Number.isNaN(value))) {
+          primeErrorBox.textContent = 'Enter valid values for all constants and required patient/prime inputs.';
+          return;
+        }
+
+        const tbvLiters = calculateTBV(genderInput.value, height, patientWeight);
+        const tbvMl = tbvLiters * 1000;
+        const anticoagulatedPatientHct = patientHct * (acdRatio / (acdRatio + 1));
+
+        let rbcOffsetVolume = customPrimeConstants.mmGcsfOnlyRbcOffsetVolume;
+        if (!isMmGcsfOnly) {
+          const rowKey = getWbRow(wbc);
+          const columnKey = `COL${Number(primeProcedureTypeInput.value) + 1}`;
+          rbcOffsetVolume = lookupData.cells[rowKey]?.[columnKey]?.[1];
+        }
+        if (!Number.isFinite(rbcOffsetVolume)) {
+          primeErrorBox.textContent = 'The selected WBC/procedure does not have an RBC offset value.';
+          return;
+        }
+
+        const kitPackedRbcVolume = kitWbVol + bloodWarmerVol;
+        const kitPackedRbcVolumeMl = rbcOffsetVolume + customPrimeConstants.rbcPackExtraVolume;
+        const maxRbcOut = (
+          ((kitPackedRbcVolume * anticoagulatedPatientHct) +
+          (kitPackedRbcVolumeMl * packedRbcHct)) /
+          (tbvMl * anticoagulatedPatientHct)
+        ) * 100;
+
+        primeTbvOutput.textContent = `${tbvMl.toFixed(0)} mL`;
+        maxRbcOutOutput.textContent = `${maxRbcOut.toFixed(2)}%`;
+        maxRbcOutOutput.classList.toggle('high-rbc-out', maxRbcOut > 10);
+      }
+
+      function resetPrimeEstimate() {
+        primeProcedureTypeInput.value = '1';
+        patientHctInput.value = '';
+        primeErrorBox.textContent = '';
+        clearPrimeResults();
+        saveFormState();
+      }
+
+      function renderYieldTable(peripheralCd34 = null, tbvLiters = null, patientWeight = null) {
+        yieldTableBody.textContent = '';
+        yieldEfficiencies.forEach((efficiency) => {
+          const row = document.createElement('tr');
+          const efficiencyHeader = document.createElement('th');
+          efficiencyHeader.scope = 'row';
+          efficiencyHeader.textContent = `${(efficiency * 100).toFixed(0)}%`;
+          row.appendChild(efficiencyHeader);
+
+          yieldBloodVolumeCounts.forEach((bloodVolumeCount) => {
+            const cell = document.createElement('td');
+            cell.textContent = peripheralCd34 === null
+              ? '--'
+              : (
+                peripheralCd34 * efficiency * tbvLiters * bloodVolumeCount / patientWeight
+              ).toFixed(1);
+            row.appendChild(cell);
+          });
+
+          yieldTableBody.appendChild(row);
+        });
+      }
+
+      function calculateYieldEstimate() {
+        yieldErrorBox.textContent = '';
+        renderYieldTable();
+
+        const peripheralCd34 = readNumber(peripheralCd34Input, true);
+        const height = readNumber(heightInput);
+        const patientWeight = readNumber(weightInput);
+        if (peripheralCd34 === null) {
+          yieldErrorBox.textContent = 'Enter a Peripheral CD34 value.';
+          return;
+        }
+        if ([peripheralCd34, height, patientWeight].some(Number.isNaN)) {
+          yieldErrorBox.textContent = 'Peripheral CD34 must be zero or greater; height and weight must be greater than zero.';
+          return;
+        }
+        if (height === null || patientWeight === null) {
+          yieldErrorBox.textContent = 'Enter patient height and weight in the top bar.';
+          return;
+        }
+
+        const tbvLiters = calculateTBV(genderInput.value, height, patientWeight);
+        renderYieldTable(peripheralCd34, tbvLiters, patientWeight);
+      }
+
+      function resetYieldEstimate() {
+        peripheralCd34Input.value = '';
+        yieldErrorBox.textContent = '';
+        renderYieldTable();
+        saveFormState();
+      }
+
+      function resetAll() {
+        resetForm();
+        resetTargetEstimate();
+        resetPrimeEstimate();
+        resetYieldEstimate();
+        genderInput.value = 'male';
+        heightInput.value = '';
+        weightInput.value = '';
+        leucocytesInput.value = '';
+        saveFormState();
+      }
+
+      function showPersistenceError(message) {
+        persistenceStatus.textContent = message;
+        persistenceStatus.hidden = false;
+      }
+
+      function saveFormState() {
+        const values = {};
+        persistentFields.forEach((field) => {
+          values[field.id] = field.value;
+        });
+
+        try {
+          localStorage.setItem(persistenceKey, JSON.stringify(values));
+          persistenceStatus.textContent = '';
+          persistenceStatus.hidden = true;
+        } catch (error) {
+          console.error('Unable to save calculator inputs on this device.', error);
+          showPersistenceError('Your inputs could not be saved on this device.');
+        }
+      }
+
+      function restoreFormState() {
+        let savedState;
+        try {
+          savedState = localStorage.getItem(persistenceKey);
+        } catch (error) {
+          console.error('Unable to access saved calculator inputs on this device.', error);
+          showPersistenceError('Saved inputs could not be accessed on this device.');
+          return false;
+        }
+
+        if (savedState === null) return false;
+
+        let values;
+        try {
+          values = JSON.parse(savedState);
+        } catch (error) {
+          console.error('Unable to parse saved calculator inputs.', error);
+          showPersistenceError('Saved inputs could not be read. Use Reset All to replace them.');
+          return false;
+        }
+
+        if (!values || typeof values !== 'object' || Array.isArray(values)) {
+          showPersistenceError('Saved inputs could not be read. Use Reset All to replace them.');
+          return false;
+        }
+
+        persistentFields.forEach((field) => {
+          const value = values[field.id];
+          if (typeof value !== 'string') return;
+          if (field.tagName === 'SELECT' && ![...field.options].some((option) => option.value === value)) {
+            return;
+          }
+          field.value = value;
+        });
+        return true;
+      }
+
+      renderYieldTable();
+      const hasSavedFormState = restoreFormState();
+      persistentFields.forEach((field) => {
+        field.addEventListener('input', saveFormState);
+        field.addEventListener('change', saveFormState);
+      });
+      window.addEventListener('pagehide', saveFormState);
+
+      calculateBtn.addEventListener('click', calculate);
+      resetBtn.addEventListener('click', resetForm);
+      resetAllBtn.addEventListener('click', resetAll);
+      calculateTargetBtn.addEventListener('click', calculateTargetEstimate);
+      resetTargetBtn.addEventListener('click', resetTargetEstimate);
+      calculatePrimeBtn.addEventListener('click', calculateCustomPrime);
+      resetPrimeBtn.addEventListener('click', resetPrimeEstimate);
+      calculateYieldBtn.addEventListener('click', calculateYieldEstimate);
+      resetYieldBtn.addEventListener('click', resetYieldEstimate);
+
+      if (hasSavedFormState) {
+        calculate();
+
+        const hasPatientMeasurements = heightInput.value.trim() !== '' && weightInput.value.trim() !== '';
+        if (hasPatientMeasurements) {
+          calculateTargetEstimate();
+        }
+
+        const hasPrimeInputs = hasPatientMeasurements &&
+          patientHctInput.value.trim() !== '' &&
+          (primeProcedureTypeInput.value === '1' || leucocytesInput.value.trim() !== '');
+        if (hasPrimeInputs) {
+          calculateCustomPrime();
+        }
+
+        if (hasPatientMeasurements && peripheralCd34Input.value.trim() !== '') {
+          calculateYieldEstimate();
+        }
+      }
+    </script>
+    <script>
+      const installPwaButton = document.getElementById('installPwaBtn');
+      const installPwaStatus = document.getElementById('installPwaStatus');
+      let deferredInstallPrompt = null;
+
+      const isStandalonePwa =
+        window.matchMedia('(display-mode: standalone)').matches || navigator.standalone === true;
+      const isIosDevice =
+        /iphone|ipad|ipod/i.test(navigator.userAgent) ||
+        (navigator.platform === 'MacIntel' && navigator.maxTouchPoints > 1);
+
+      if (isStandalonePwa) {
+        installPwaButton.hidden = true;
+      } else {
+        window.addEventListener('beforeinstallprompt', (event) => {
+          event.preventDefault();
+          deferredInstallPrompt = event;
+        });
+
+        installPwaButton.addEventListener('click', async () => {
+          installPwaStatus.hidden = true;
+
+          if (!deferredInstallPrompt) {
+            installPwaStatus.textContent = isIosDevice
+              ? 'In Safari, tap Share, then Add to Home Screen.'
+              : 'Use your browser menu to choose Install App or Add to Home Screen. Installation requires HTTPS.';
+            installPwaStatus.hidden = false;
+            return;
+          }
+
+          const installPrompt = deferredInstallPrompt;
+          deferredInstallPrompt = null;
+          try {
+            await installPrompt.prompt();
+            const { outcome } = await installPrompt.userChoice;
+            installPwaStatus.textContent = outcome === 'accepted'
+              ? 'Installation started.'
+              : 'Installation was dismissed.';
+            installPwaStatus.hidden = false;
+            if (outcome === 'accepted') installPwaButton.hidden = true;
+          } catch (error) {
+            console.error('Unable to open the PWA installation prompt.', error);
+            installPwaStatus.textContent = 'The install prompt could not be opened. Use your browser menu to install the app.';
+            installPwaStatus.hidden = false;
+          }
+        });
+      }
+
+      window.addEventListener('appinstalled', () => {
+        installPwaButton.hidden = true;
+        installPwaStatus.textContent = 'App installed.';
+        installPwaStatus.hidden = false;
+      });
+    </script>
+    <script>
+      if ('serviceWorker' in navigator) {
+        navigator.serviceWorker.addEventListener('message', (event) => {
+          if (!event.data || event.data.type !== 'APP_UNPUBLISHED') return;
+          document.body.textContent = '';
+          const notice = document.createElement('main');
+          notice.className = 'page';
+          notice.setAttribute('role', 'alert');
+          notice.textContent = 'This application is no longer published.';
+          document.body.appendChild(notice);
+        });
+
+        window.addEventListener('load', () => {
+          navigator.serviceWorker.register('./sw.js', { updateViaCache: 'none' })
+            .then((registration) => registration.update())
+            .catch(() => {});
+        });
+      }
+    </script>
+  </body>
+</html>
